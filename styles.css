@@ -1,0 +1,82 @@
+* { box-sizing: border-box; }
+body {
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  margin: 20px;
+  background: #0f172a;
+  color: #e2e8f0;
+}
+h1, h2 { margin-bottom: 8px; }
+section {
+  background: #111827;
+  border: 1px solid #334155;
+  border-radius: 12px;
+  padding: 14px;
+  margin: 14px 0;
+}
+button {
+  background: #2563eb;
+  border: none;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-right: 6px;
+  margin-bottom: 6px;
+}
+button:hover { background: #1d4ed8; }
+.row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+input {
+  flex: 1;
+  background: #0b1220;
+  color: #e2e8f0;
+  border: 1px solid #475569;
+  border-radius: 8px;
+  padding: 8px;
+}
+.muted { color: #94a3b8; }
+.result {
+  margin-top: 10px;
+  background: #0b1220;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  padding: 10px;
+  max-height: 280px;
+  overflow: auto;
+}
+.file-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px;
+  border-bottom: 1px solid #1f2937;
+}
+.path { color: #cbd5e1; font-size: 12px; }
+.size { color: #22c55e; font-size: 12px; min-width: 72px; }
+.folder-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 0;
+  border-bottom: 1px dashed #1f2937;
+}
+.clean-btn {
+  margin-top: 8px;
+  background: #0ea5e9;
+}
+.clean-btn:hover {
+  background: #0284c7;
+}
+.clean-btn.dry {
+  background: #64748b;
+}
+.row-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}

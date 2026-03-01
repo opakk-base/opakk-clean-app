@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Electron Cleaner</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <h1>Electron Cleaner</h1>
+    <p class="muted" id="platformNote">Prioritas optimasi: macOS, lalu Windows/Linux.</p>
+
+    <section>
+      <h2>1) Scan Cache / Junk</h2>
+      <div class="row">
+        <button id="presetDownloads">Preset Downloads</button>
+        <button id="presetMovies">Preset Movies</button>
+        <button id="presetDesktop">Preset Desktop</button>
+      </div>
+      <button id="scanJunkBtn">Scan Junk</button>
+      <div id="junkResult" class="result"></div>
+    </section>
+
+    <section>
+      <h2>2) Cari File Besar</h2>
+      <div class="row">
+        <label>Folder:</label>
+        <input id="rootDir" placeholder="contoh: /Users/rizal/Downloads" />
+      </div>
+      <div class="row">
+        <label>Min size (MB):</label>
+        <input id="minMB" type="number" value="100" min="1" />
+      </div>
+      <div class="row">
+        <label>Filter ext (opsional):</label>
+        <input id="extFilter" placeholder="contoh: .mp4,.zip,.dmg" />
+      </div>
+      <button id="scanLargeBtn">Scan File Besar</button>
+      <button id="exportJsonBtn">Export JSON</button>
+      <button id="exportCsvBtn">Export CSV</button>
+      <div id="largeResult" class="result"></div>
+      <div id="folderStats" class="result"></div>
+    </section>
+
+    <section>
+      <h2>3) Hapus ke Trash</h2>
+      <p class="muted">Pilih file dari list "file besar", lalu klik tombol hapus.</p>
+      <label class="row-inline"><input type="checkbox" id="dryRunDelete" /> Dry run (simulasi, tanpa hapus)</label>
+      <button id="deleteSelectedBtn">Hapus Yang Dipilih</button>
+      <div id="deleteResult" class="result"></div>
+    </section>
+
+    <script src="renderer.js"></script>
+  </body>
+</html>
