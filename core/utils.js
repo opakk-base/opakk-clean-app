@@ -1,9 +1,3 @@
-window.AppState = {
-  currentLargeFiles: [],
-  currentTopFolders: [],
-  lastJunkRows: [],
-};
-
 function downloadTextFile(filename, content, mime = 'text/plain') {
   const blob = new Blob([content], { type: mime });
   const url = URL.createObjectURL(blob);

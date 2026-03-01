@@ -29,9 +29,10 @@
       "main.js",
       "preload.js",
       "index.html",
-      "renderer.js",
       "styles.css",
-      "package.json"
+      "package.json",
+      "core/**/*",
+      "features/**/*"
     ],
     "directories": {
       "output": "dist"

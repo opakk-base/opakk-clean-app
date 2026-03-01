@@ -46,6 +46,18 @@ npm run dist:linux
 
 Output installer ada di folder `dist/`.
 
+## Struktur Frontend
+
+- `core/` → state & utility global
+- `features/<feature>/logic.js` → business logic
+- `features/<feature>/ui.js` → event handler + render DOM
+
+Contoh:
+- `features/junk/{logic,ui}.js`
+- `features/large/{logic,ui}.js`
+- `features/delete/{logic,ui}.js`
+- `features/sidebar/{logic,ui}.js`
+
 ## Catatan
 
 - Penghapusan memakai `shell.trashItem()` (lebih aman dari delete permanen).

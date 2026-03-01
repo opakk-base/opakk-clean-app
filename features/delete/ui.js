@@ -18,7 +18,7 @@
     deleteResult.textContent = dryRunDelete.checked ? 'Simulasi hapus...' : 'Menghapus ke Trash...';
 
     try {
-      const res = await window.cleanerAPI.deletePaths(targets, dryRunDelete.checked);
+      const res = await window.DeleteLogic.deletePaths(targets, dryRunDelete.checked);
       if (res.dryRun) {
         deleteResult.innerHTML = `<div>🧪 Dry run: ${res.wouldDeleteCount} file akan dihapus.</div>`;
         return;

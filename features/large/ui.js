@@ -24,16 +24,7 @@
     largeLoading.classList.remove('hidden');
 
     try {
-      const payload = await window.cleanerAPI.scanLargeFiles({
-        rootDir,
-        minMB,
-        maxResults: 500,
-        maxDepth: 12,
-        extensions,
-      });
-
-      window.AppState.currentLargeFiles = payload.files || [];
-      window.AppState.currentTopFolders = payload.topFolders || [];
+      await window.LargeLogic.scanLarge({ rootDir, minMB, maxResults: 500, maxDepth: 12, extensions });
 
       if (!window.AppState.currentLargeFiles.length) {
         largeLoading.classList.add('hidden');
@@ -43,15 +34,13 @@
       }
 
       largeResult.innerHTML = window.AppState.currentLargeFiles
-        .map(
-          (f, idx) => `
-            <div class="file-item">
-              <input type="checkbox" data-index="${idx}" />
-              <span class="size">${f.sizeText}</span>
-              <span class="path">${f.path}</span>
-            </div>
-          `
-        )
+        .map((f, idx) => `
+          <div class="file-item">
+            <input type="checkbox" data-index="${idx}" />
+            <span class="size">${f.sizeText}</span>
+            <span class="path">${f.path}</span>
+          </div>
+        `)
         .join('');
 
       folderStats.innerHTML = window.AppState.currentTopFolders.length
@@ -67,19 +56,6 @@
     }
   });
 
-  exportJsonBtn.addEventListener('click', () => {
-    const payload = {
-      generatedAt: new Date().toISOString(),
-      largeFiles: window.AppState.currentLargeFiles,
-      topFolders: window.AppState.currentTopFolders,
-      junkTargets: window.AppState.lastJunkRows,
-    };
-    window.AppUtils.downloadTextFile(`cleaner-report-${Date.now()}.json`, JSON.stringify(payload, null, 2), 'application/json');
-  });
-
-  exportCsvBtn.addEventListener('click', () => {
-    const rows = window.AppState.currentLargeFiles.map((f) => ({ path: f.path, size: f.size, sizeText: f.sizeText }));
-    const csv = window.AppUtils.toCsv(rows);
-    window.AppUtils.downloadTextFile(`large-files-${Date.now()}.csv`, csv, 'text/csv');
-  });
+  exportJsonBtn.addEventListener('click', window.LargeLogic.exportJson);
+  exportCsvBtn.addEventListener('click', window.LargeLogic.exportCsv);
 })();
