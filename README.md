@@ -46,17 +46,25 @@ npm run dist:linux
 
 Output installer ada di folder `dist/`.
 
-## Struktur Frontend
+## Struktur Project (baru)
 
-- `core/` → state & utility global
-- `features/<feature>/logic.js` → business logic
-- `features/<feature>/ui.js` → event handler + render DOM
+```text
+my-project/
+├─ src/
+│  ├─ main/
+│  │  └─ index.ts
+│  ├─ preload/
+│  │  └─ index.ts
+│  ├─ renderer/
+│  │  └─ index.ts
+│  ├─ common/
+│  ├─ shared/
+│  └─ resources/
+└─ static/
+```
 
-Contoh:
-- `features/junk/{logic,ui}.js`
-- `features/large/{logic,ui}.js`
-- `features/delete/{logic,ui}.js`
-- `features/sidebar/{logic,ui}.js`
+> Catatan: struktur TypeScript sudah disiapkan sebagai fondasi.
+> Runtime saat ini masih memakai file JS lama sampai migrasi logic selesai.
 
 ## Catatan
 
