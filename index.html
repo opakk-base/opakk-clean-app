@@ -14,10 +14,10 @@
           <p class="muted" id="platformNote">Prioritas optimasi: macOS, lalu Windows/Linux.</p>
         </div>
 
-        <nav class="menu">
-          <a href="#junk">Cache / Junk</a>
-          <a href="#large">File Besar</a>
-          <a href="#delete">Hapus ke Trash</a>
+        <nav class="menu" id="sidebarMenu">
+          <button class="menu-btn active" data-target="junk">Cache / Junk</button>
+          <button class="menu-btn" data-target="large">File Besar</button>
+          <button class="menu-btn" data-target="delete">Hapus ke Trash</button>
         </nav>
 
         <div class="sidebar-footer muted">
@@ -26,7 +26,7 @@
       </aside>
 
       <main class="content">
-        <section id="junk" class="glass">
+        <section id="junk" class="glass content-panel active-panel">
           <h2>1) Scan Cache / Junk</h2>
           <div class="row">
             <button id="presetDownloads">Preset Downloads</button>
@@ -37,7 +37,7 @@
           <div id="junkResult" class="result"></div>
         </section>
 
-        <section id="large" class="glass">
+        <section id="large" class="glass content-panel">
           <h2>2) Cari File Besar</h2>
           <div class="row">
             <label>Folder:</label>
@@ -60,7 +60,7 @@
           <div id="folderStats" class="result"></div>
         </section>
 
-        <section id="delete" class="glass">
+        <section id="delete" class="glass content-panel">
           <h2>3) Hapus ke Trash</h2>
           <p class="muted">Pilih file dari list "file besar", lalu klik tombol hapus.</p>
           <label class="row-inline"><input type="checkbox" id="dryRunDelete" /> Dry run (simulasi, tanpa hapus)</label>

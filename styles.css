@@ -37,7 +37,8 @@ body {
   height: calc(100vh - 28px);
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start;
+  gap: 16px;
 }
 
 .content {
@@ -65,13 +66,23 @@ section {
   margin-bottom: 14px;
 }
 
+.content-panel {
+  display: none;
+}
+
+.content-panel.active-panel {
+  display: block;
+}
+
 .menu {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.menu a {
+.menu-btn {
+  width: 100%;
+  text-align: left;
   text-decoration: none;
   color: #dbeafe;
   padding: 10px 12px;
@@ -80,8 +91,13 @@ section {
   border: 1px solid rgba(148, 163, 184, 0.2);
 }
 
-.menu a:hover {
+.menu-btn:hover {
   background: rgba(59, 130, 246, 0.25);
+}
+
+.menu-btn.active {
+  background: rgba(79, 140, 255, 0.35);
+  border-color: rgba(125, 171, 255, 0.65);
 }
 
 button {
@@ -96,6 +112,19 @@ button {
 }
 
 button:hover { background: var(--primary-hover); }
+
+.menu-btn {
+  background: rgba(30, 41, 59, 0.45) !important;
+  color: #dbeafe;
+}
+
+.menu-btn:hover {
+  background: rgba(59, 130, 246, 0.25) !important;
+}
+
+.menu-btn.active {
+  background: rgba(79, 140, 255, 0.35) !important;
+}
 
 .row {
   display: flex;
