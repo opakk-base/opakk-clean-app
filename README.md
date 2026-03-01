@@ -15,15 +15,20 @@ Aplikasi Electron untuk:
 - **Windows**: Temp/INetCache/Chrome Cache/VS Code Cache
 - **Linux**: `/tmp`, `~/.cache`, Trash, VS Code cache
 
-## Menjalankan
+## Menjalankan (electron-vite)
 
 ```bash
 cd electron-cleaner
 npm install
-npm start
+npm run dev
 ```
 
-`npm start` sekarang akan compile TypeScript dulu (`build:ts`) lalu menjalankan Electron.
+Build production:
+
+```bash
+npm run build
+npm start
+```
 
 ## Packaging / Build Installer
 
@@ -58,15 +63,17 @@ my-project/
 │  ├─ preload/
 │  │  └─ index.ts
 │  ├─ renderer/
-│  │  └─ index.ts
-│  ├─ common/
+│  │  ├─ index.html
+│  │  ├─ index.ts
+│  │  ├─ core/
+│  │  └─ features/
+│  ├─ lib/
 │  ├─ shared/
 │  └─ resources/
 └─ static/
 ```
 
-> Catatan: struktur TypeScript sudah disiapkan sebagai fondasi.
-> Runtime saat ini masih memakai file JS lama sampai migrasi logic selesai.
+> Struktur sekarang sudah aktif dipakai oleh runtime melalui `electron-vite`.
 
 ## Catatan
 

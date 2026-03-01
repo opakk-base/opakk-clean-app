@@ -15,7 +15,11 @@ function createWindow() {
     },
   });
 
-  win.loadFile(path.join(__dirname, '../../index.html'));
+  if (process.env.MAIN_WINDOW_VITE_DEV_SERVER_URL) {
+    win.loadURL(process.env.MAIN_WINDOW_VITE_DEV_SERVER_URL);
+  } else {
+    win.loadFile(path.join(__dirname, '../renderer/index.html'));
+  }
 }
 
 app.whenReady().then(() => {

@@ -1,4 +1,14 @@
-// Entry point for renderer process (TypeScript structure)
-// TODO: migrate renderer modules from ../../core and ../../features
+import './core/state.js';
+import './core/utils.js';
 
-export {};
+import './features/sidebar/logic.js';
+import './features/sidebar/ui.js';
+
+import './features/junk/logic.js';
+import './features/junk/ui.js';
+
+import './features/large/logic.js';
+import './features/large/ui.js';
+
+import './features/delete/logic.js';
+import './features/delete/ui.js';

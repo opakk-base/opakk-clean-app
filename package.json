@@ -4,13 +4,14 @@
   "description": "Electron app to clean junk/cache files and find large files",
   "main": "dist-electron/main/index.js",
   "scripts": {
-    "build:ts": "tsc",
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
     "typecheck": "tsc --noEmit",
-    "start": "npm run build:ts && electron .",
-    "dist": "npm run build:ts && electron-builder --publish never",
-    "dist:mac": "npm run build:ts && electron-builder --mac dmg zip --universal --publish never",
-    "dist:win": "npm run build:ts && electron-builder --win --publish never",
-    "dist:linux": "npm run build:ts && electron-builder --linux --publish never"
+    "start": "electron-vite preview",
+    "dist": "npm run build && electron-builder --publish never",
+    "dist:mac": "npm run build && electron-builder --mac dmg zip --universal --publish never",
+    "dist:win": "npm run build && electron-builder --win --publish never",
+    "dist:linux": "npm run build && electron-builder --linux --publish never"
   },
   "keywords": [
     "electron",
@@ -24,18 +25,16 @@
     "@types/node": "^25.3.3",
     "electron": "^31.0.2",
     "electron-builder": "^24.13.3",
-    "typescript": "^5.9.3"
+    "electron-vite": "^2.3.0",
+    "typescript": "^5.9.3",
+    "vite": "^5.4.19"
   },
   "build": {
     "appId": "com.rizal.electroncleaner",
     "productName": "Electron Cleaner",
     "files": [
       "dist-electron/**/*",
-      "index.html",
-      "styles.css",
       "package.json",
-      "core/**/*",
-      "features/**/*",
       "static/**/*"
     ],
     "directories": {

@@ -11,6 +11,6 @@
     "skipLibCheck": true,
     "types": ["node"]
   },
-  "include": ["src/main/**/*.ts", "src/preload/**/*.ts"],
+  "include": ["src/main/**/*.ts", "src/preload/**/*.ts", "src/renderer/**/*.ts", "electron.vite.config.ts"],
   "exclude": ["node_modules", "dist", "dist-electron"]
 }
