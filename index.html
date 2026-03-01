@@ -7,48 +7,68 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <h1>Electron Cleaner</h1>
-    <p class="muted" id="platformNote">Prioritas optimasi: macOS, lalu Windows/Linux.</p>
+    <div class="app-shell">
+      <aside class="sidebar glass">
+        <div>
+          <h1>Electron Cleaner</h1>
+          <p class="muted" id="platformNote">Prioritas optimasi: macOS, lalu Windows/Linux.</p>
+        </div>
 
-    <section>
-      <h2>1) Scan Cache / Junk</h2>
-      <div class="row">
-        <button id="presetDownloads">Preset Downloads</button>
-        <button id="presetMovies">Preset Movies</button>
-        <button id="presetDesktop">Preset Desktop</button>
-      </div>
-      <button id="scanJunkBtn">Scan Junk</button>
-      <div id="junkResult" class="result"></div>
-    </section>
+        <nav class="menu">
+          <a href="#junk">Cache / Junk</a>
+          <a href="#large">File Besar</a>
+          <a href="#delete">Hapus ke Trash</a>
+        </nav>
 
-    <section>
-      <h2>2) Cari File Besar</h2>
-      <div class="row">
-        <label>Folder:</label>
-        <input id="rootDir" placeholder="contoh: /Users/rizal/Downloads" />
-      </div>
-      <div class="row">
-        <label>Min size (MB):</label>
-        <input id="minMB" type="number" value="100" min="1" />
-      </div>
-      <div class="row">
-        <label>Filter ext (opsional):</label>
-        <input id="extFilter" placeholder="contoh: .mp4,.zip,.dmg" />
-      </div>
-      <button id="scanLargeBtn">Scan File Besar</button>
-      <button id="exportJsonBtn">Export JSON</button>
-      <button id="exportCsvBtn">Export CSV</button>
-      <div id="largeResult" class="result"></div>
-      <div id="folderStats" class="result"></div>
-    </section>
+        <div class="sidebar-footer muted">
+          Style: Tahoe-inspired (semi transparent)
+        </div>
+      </aside>
 
-    <section>
-      <h2>3) Hapus ke Trash</h2>
-      <p class="muted">Pilih file dari list "file besar", lalu klik tombol hapus.</p>
-      <label class="row-inline"><input type="checkbox" id="dryRunDelete" /> Dry run (simulasi, tanpa hapus)</label>
-      <button id="deleteSelectedBtn">Hapus Yang Dipilih</button>
-      <div id="deleteResult" class="result"></div>
-    </section>
+      <main class="content">
+        <section id="junk" class="glass">
+          <h2>1) Scan Cache / Junk</h2>
+          <div class="row">
+            <button id="presetDownloads">Preset Downloads</button>
+            <button id="presetMovies">Preset Movies</button>
+            <button id="presetDesktop">Preset Desktop</button>
+          </div>
+          <button id="scanJunkBtn">Scan Junk</button>
+          <div id="junkResult" class="result"></div>
+        </section>
+
+        <section id="large" class="glass">
+          <h2>2) Cari File Besar</h2>
+          <div class="row">
+            <label>Folder:</label>
+            <input id="rootDir" placeholder="contoh: /Users/rizal/Downloads" />
+          </div>
+          <div class="row">
+            <label>Min size (MB):</label>
+            <input id="minMB" type="number" value="100" min="1" />
+          </div>
+          <div class="row">
+            <label>Filter ext (opsional):</label>
+            <input id="extFilter" placeholder="contoh: .mp4,.zip,.dmg" />
+          </div>
+          <div class="row">
+            <button id="scanLargeBtn">Scan File Besar</button>
+            <button id="exportJsonBtn">Export JSON</button>
+            <button id="exportCsvBtn">Export CSV</button>
+          </div>
+          <div id="largeResult" class="result"></div>
+          <div id="folderStats" class="result"></div>
+        </section>
+
+        <section id="delete" class="glass">
+          <h2>3) Hapus ke Trash</h2>
+          <p class="muted">Pilih file dari list "file besar", lalu klik tombol hapus.</p>
+          <label class="row-inline"><input type="checkbox" id="dryRunDelete" /> Dry run (simulasi, tanpa hapus)</label>
+          <button id="deleteSelectedBtn">Hapus Yang Dipilih</button>
+          <div id="deleteResult" class="result"></div>
+        </section>
+      </main>
+    </div>
 
     <script src="renderer.js"></script>
   </body>
