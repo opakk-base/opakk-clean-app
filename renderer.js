@@ -11,6 +11,7 @@ const exportJsonBtn = document.getElementById('exportJsonBtn');
 const exportCsvBtn = document.getElementById('exportCsvBtn');
 const largeResult = document.getElementById('largeResult');
 const folderStats = document.getElementById('folderStats');
+const largeLoading = document.getElementById('largeLoading');
 const rootDirInput = document.getElementById('rootDir');
 const minMBInput = document.getElementById('minMB');
 const extFilterInput = document.getElementById('extFilter');
@@ -149,8 +150,9 @@ scanLargeBtn.addEventListener('click', async () => {
     return;
   }
 
-  largeResult.textContent = 'Scanning large files...';
-  folderStats.textContent = 'Menghitung statistik folder...';
+  largeResult.textContent = '';
+  folderStats.textContent = '';
+  largeLoading.classList.remove('hidden');
 
   try {
     const payload = await window.cleanerAPI.scanLargeFiles({
@@ -165,6 +167,7 @@ scanLargeBtn.addEventListener('click', async () => {
     currentTopFolders = payload.topFolders || [];
 
     if (!currentLargeFiles.length) {
+      largeLoading.classList.add('hidden');
       largeResult.textContent = 'Tidak ada file besar ditemukan.';
       folderStats.textContent = 'Statistik folder kosong.';
       return;
@@ -186,7 +189,10 @@ scanLargeBtn.addEventListener('click', async () => {
       ? `<div><b>Top folder berdasarkan total file besar:</b></div>
         ${currentTopFolders.map((f) => `<div class="folder-row">📁 ${f.folder} <span class="size">${f.sizeText}</span></div>`).join('')}`
       : 'Statistik folder tidak tersedia.';
+
+    largeLoading.classList.add('hidden');
   } catch (err) {
+    largeLoading.classList.add('hidden');
     largeResult.textContent = `Error: ${err.message}`;
     folderStats.textContent = '';
   }

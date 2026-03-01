@@ -39,22 +39,31 @@
 
         <section id="large" class="glass content-panel">
           <h2>2) Cari File Besar</h2>
-          <div class="row">
-            <label>Folder:</label>
-            <input id="rootDir" placeholder="contoh: /Users/rizal/Downloads" />
+          <div class="large-toolbar">
+            <div class="field-group">
+              <label>Folder</label>
+              <input id="rootDir" placeholder="contoh: /Users/rizal/Downloads" />
+            </div>
+            <div class="field-group small">
+              <label>Min size (MB)</label>
+              <input id="minMB" type="number" value="100" min="1" />
+            </div>
+            <div class="field-group">
+              <label>Filter ext (opsional)</label>
+              <input id="extFilter" placeholder="contoh: .mp4,.zip,.dmg" />
+            </div>
           </div>
-          <div class="row">
-            <label>Min size (MB):</label>
-            <input id="minMB" type="number" value="100" min="1" />
-          </div>
-          <div class="row">
-            <label>Filter ext (opsional):</label>
-            <input id="extFilter" placeholder="contoh: .mp4,.zip,.dmg" />
-          </div>
-          <div class="row">
+          <div class="row left-actions">
             <button id="scanLargeBtn">Scan File Besar</button>
             <button id="exportJsonBtn">Export JSON</button>
             <button id="exportCsvBtn">Export CSV</button>
+          </div>
+          <div id="largeLoading" class="loading-card hidden">
+            <div class="spinner"></div>
+            <div>
+              <div class="loading-title">Sedang scan file besar...</div>
+              <div class="muted">Menjelajah folder dan menghitung ukuran file</div>
+            </div>
           </div>
           <div id="largeResult" class="result"></div>
           <div id="folderStats" class="result"></div>
