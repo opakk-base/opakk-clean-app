@@ -23,6 +23,8 @@ npm install
 npm start
 ```
 
+`npm start` sekarang akan compile TypeScript dulu (`build:ts`) lalu menjalankan Electron.
+
 ## Packaging / Build Installer
 
 ```bash

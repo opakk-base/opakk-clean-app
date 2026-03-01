@@ -2,13 +2,15 @@
   "name": "electron-cleaner",
   "version": "1.0.0",
   "description": "Electron app to clean junk/cache files and find large files",
-  "main": "main.js",
+  "main": "dist-electron/main/index.js",
   "scripts": {
-    "start": "electron .",
-    "dist": "electron-builder --publish never",
-    "dist:mac": "electron-builder --mac dmg zip --universal --publish never",
-    "dist:win": "electron-builder --win --publish never",
-    "dist:linux": "electron-builder --linux --publish never"
+    "build:ts": "tsc",
+    "typecheck": "tsc --noEmit",
+    "start": "npm run build:ts && electron .",
+    "dist": "npm run build:ts && electron-builder --publish never",
+    "dist:mac": "npm run build:ts && electron-builder --mac dmg zip --universal --publish never",
+    "dist:win": "npm run build:ts && electron-builder --win --publish never",
+    "dist:linux": "npm run build:ts && electron-builder --linux --publish never"
   },
   "keywords": [
     "electron",
@@ -19,20 +21,22 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
+    "@types/node": "^25.3.3",
     "electron": "^31.0.2",
-    "electron-builder": "^24.13.3"
+    "electron-builder": "^24.13.3",
+    "typescript": "^5.9.3"
   },
   "build": {
     "appId": "com.rizal.electroncleaner",
     "productName": "Electron Cleaner",
     "files": [
-      "main.js",
-      "preload.js",
+      "dist-electron/**/*",
       "index.html",
       "styles.css",
       "package.json",
       "core/**/*",
-      "features/**/*"
+      "features/**/*",
+      "static/**/*"
     ],
     "directories": {
       "output": "dist"

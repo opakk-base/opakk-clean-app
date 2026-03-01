@@ -1,4 +1,10 @@
-// Entry point for Electron preload process (TypeScript structure)
-// TODO: migrate logic from ../../preload.js
+import { contextBridge, ipcRenderer } from 'electron';
 
-export {};
+contextBridge.exposeInMainWorld('cleanerAPI', {
+  getPlatform: () => ipcRenderer.invoke('app-platform'),
+  getHome: () => ipcRenderer.invoke('app-home'),
+  scanJunk: (targets: string[]) => ipcRenderer.invoke('scan-junk', targets),
+  cleanJunkTarget: (targetPath: string, dryRun?: boolean) => ipcRenderer.invoke('clean-junk-target', targetPath, dryRun),
+  scanLargeFiles: (payload: unknown) => ipcRenderer.invoke('scan-large-files', payload),
+  deletePaths: (paths: string[], dryRun?: boolean) => ipcRenderer.invoke('delete-paths', paths, dryRun),
+});
