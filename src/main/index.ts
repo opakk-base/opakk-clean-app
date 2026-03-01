@@ -1,41 +1,50 @@
-import { app, BrowserWindow, ipcMain, shell } from 'electron';
-import path from 'path';
-import fs from 'fs';
-import fsp from 'fs/promises';
-import os from 'os';
+import { app, BrowserWindow, ipcMain, shell } from "electron";
+import path from "path";
+import fs from "fs";
+import fsp from "fs/promises";
+import os from "os";
+import type {
+  JunkRow,
+  ScanLargePayload,
+  LargeFile,
+  TopFolder,
+  ScanLargeResult,
+} from "../shared/types";
 
-function createWindow() {
+function createWindow(): void {
   const win = new BrowserWindow({
     width: 1220,
     height: 840,
     webPreferences: {
-      preload: path.join(__dirname, '../preload/index.js'),
+      preload: path.join(__dirname, "../preload/index.js"),
       contextIsolation: true,
       nodeIntegration: false,
     },
   });
 
-  if (process.env.MAIN_WINDOW_VITE_DEV_SERVER_URL) {
-    win.loadURL(process.env.MAIN_WINDOW_VITE_DEV_SERVER_URL);
+  if (process.env.ELECTRON_RENDERER_URL) {
+    win.loadURL(process.env.ELECTRON_RENDERER_URL);
   } else {
-    win.loadFile(path.join(__dirname, '../renderer/index.html'));
+    win.loadFile(path.join(__dirname, "../renderer/index.html"));
   }
 }
 
 app.whenReady().then(() => {
   createWindow();
-  app.on('activate', () => {
+  app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });
 });
 
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') app.quit();
+app.on("window-all-closed", () => {
+  if (process.platform !== "darwin") app.quit();
 });
 
-function bytesToReadable(bytes: number) {
+// ─── Utilities ──────────────────────────────────────────────
+
+function bytesToReadable(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
-  const units = ['KB', 'MB', 'GB', 'TB'];
+  const units = ["KB", "MB", "GB", "TB"];
   let size = bytes / 1024;
   let i = 0;
   while (size >= 1024 && i < units.length - 1) {
@@ -45,44 +54,79 @@ function bytesToReadable(bytes: number) {
   return `${size.toFixed(2)} ${units[i]}`;
 }
 
-function getDefaultJunkTargets() {
+// ─── Junk Target Detection ─────────────────────────────────
+
+function getDefaultJunkTargets(): string[] {
   const home = os.homedir();
   const tmp = os.tmpdir();
 
-  if (process.platform === 'darwin') {
+  if (process.platform === "darwin") {
     return [
       tmp,
-      path.join(home, 'Downloads'),
-      path.join(home, 'Movies'),
-      path.join(home, 'Desktop'),
-      path.join(home, 'Library', 'Caches'),
-      path.join(home, 'Library', 'Logs'),
-      path.join(home, 'Library', 'Containers', 'com.apple.Safari', 'Data', 'Library', 'Caches'),
-      path.join(home, 'Library', 'Application Support', 'Google', 'Chrome', 'Default', 'Cache'),
-      path.join(home, 'Library', 'Application Support', 'Code', 'Cache'),
+      path.join(home, "Downloads"),
+      path.join(home, "Movies"),
+      path.join(home, "Desktop"),
+      path.join(home, "Library", "Caches"),
+      path.join(home, "Library", "Logs"),
+      path.join(
+        home,
+        "Library",
+        "Containers",
+        "com.apple.Safari",
+        "Data",
+        "Library",
+        "Caches",
+      ),
+      path.join(
+        home,
+        "Library",
+        "Application Support",
+        "Google",
+        "Chrome",
+        "Default",
+        "Cache",
+      ),
+      path.join(home, "Library", "Application Support", "Code", "Cache"),
     ];
   }
 
-  if (process.platform === 'win32') {
+  if (process.platform === "win32") {
     return [
       tmp,
-      path.join(home, 'AppData', 'Local', 'Temp'),
-      path.join(home, 'AppData', 'Local', 'Microsoft', 'Windows', 'INetCache'),
-      path.join(home, 'AppData', 'Local', 'Google', 'Chrome', 'User Data', 'Default', 'Cache'),
-      path.join(home, 'AppData', 'Roaming', 'Code', 'Cache'),
+      path.join(home, "AppData", "Local", "Temp"),
+      path.join(home, "AppData", "Local", "Microsoft", "Windows", "INetCache"),
+      path.join(
+        home,
+        "AppData",
+        "Local",
+        "Google",
+        "Chrome",
+        "User Data",
+        "Default",
+        "Cache",
+      ),
+      path.join(home, "AppData", "Roaming", "Code", "Cache"),
     ];
   }
 
   return [
     tmp,
-    path.join(home, '.cache'),
-    path.join(home, '.local', 'share', 'Trash', 'files'),
-    path.join(home, '.config', 'Code', 'Cache'),
+    path.join(home, ".cache"),
+    path.join(home, ".local", "share", "Trash", "files"),
+    path.join(home, ".config", "Code", "Cache"),
   ];
 }
 
-async function quickDirMetrics(target: string) {
-  const result = { exists: false, items: 0, totalSize: 0 };
+// ─── Directory Metrics ──────────────────────────────────────
+
+interface DirMetrics {
+  exists: boolean;
+  items: number;
+  totalSize: number;
+}
+
+async function quickDirMetrics(target: string): Promise<DirMetrics> {
+  const result: DirMetrics = { exists: false, items: 0, totalSize: 0 };
 
   let entries: fs.Dirent[];
   try {
@@ -99,43 +143,66 @@ async function quickDirMetrics(target: string) {
     const p = path.join(target, entry.name);
     try {
       const st = await fsp.stat(p);
-      if (st.isFile()) result.totalSize += st.size;
-      else if (st.isDirectory()) {
+      if (st.isFile()) {
+        result.totalSize += st.size;
+      } else if (st.isDirectory()) {
         const sub = await fsp.readdir(p, { withFileTypes: true });
         for (const s of sub) {
           if (!s.isFile()) continue;
           try {
             const fst = await fsp.stat(path.join(p, s.name));
             result.totalSize += fst.size;
-          } catch {}
+          } catch {
+            // Skip inaccessible files
+          }
         }
       }
-    } catch {}
+    } catch {
+      // Skip inaccessible entries
+    }
   }
 
   return result;
 }
 
-async function walkDirForLargeFiles(rootDir: string, minBytes: number, options: any = {}) {
+// ─── Large File Scanner ─────────────────────────────────────
+
+interface WalkOptions {
+  maxResults?: number;
+  maxDepth?: number;
+  extensions?: string[];
+}
+
+async function walkDirForLargeFiles(
+  rootDir: string,
+  minBytes: number,
+  options: WalkOptions = {},
+): Promise<ScanLargeResult> {
   const { maxResults = 500, maxDepth = 10, extensions = [] } = options;
 
-  const ignoreNames = new Set(['node_modules', '.git', '.next', 'dist', 'build']);
+  const ignoreNames = new Set([
+    "node_modules",
+    ".git",
+    ".next",
+    "dist",
+    "build",
+  ]);
   const allowExt = new Set(
     extensions
-      .map((e: string) => e.trim().toLowerCase())
+      .map((e) => e.trim().toLowerCase())
       .filter(Boolean)
-      .map((e: string) => (e.startsWith('.') ? e : `.${e}`))
+      .map((e) => (e.startsWith(".") ? e : `.${e}`)),
   );
 
-  const results: Array<{ path: string; size: number; sizeText: string }> = [];
+  const results: LargeFile[] = [];
   const folderStats = new Map<string, number>();
 
-  function addFolderSize(filePath: string, size: number) {
+  function addFolderSize(filePath: string, size: number): void {
     const dir = path.dirname(filePath);
-    folderStats.set(dir, (folderStats.get(dir) || 0) + size);
+    folderStats.set(dir, (folderStats.get(dir) ?? 0) + size);
   }
 
-  async function walk(current: string, depth: number) {
+  async function walk(current: string, depth: number): Promise<void> {
     if (results.length >= maxResults) return;
     if (depth > maxDepth) return;
 
@@ -170,27 +237,37 @@ async function walkDirForLargeFiles(rootDir: string, minBytes: number, options: 
             addFolderSize(fullPath, stat.size);
           }
         }
-      } catch {}
+      } catch {
+        // Skip inaccessible entries
+      }
     }
   }
 
   await walk(rootDir, 0);
   results.sort((a, b) => b.size - a.size);
 
-  const topFolders = [...folderStats.entries()]
-    .map(([folder, size]) => ({ folder, size, sizeText: bytesToReadable(size) }))
+  const topFolders: TopFolder[] = [...folderStats.entries()]
+    .map(([folder, size]) => ({
+      folder,
+      size,
+      sizeText: bytesToReadable(size),
+    }))
     .sort((a, b) => b.size - a.size)
     .slice(0, 15);
 
   return { files: results, topFolders };
 }
 
-ipcMain.handle('app-platform', async () => process.platform);
-ipcMain.handle('app-home', async () => os.homedir());
+// ─── IPC Handlers ───────────────────────────────────────────
 
-ipcMain.handle('scan-junk', async (_event, customTargets: string[] = []) => {
-  const targets = customTargets.length ? customTargets : getDefaultJunkTargets();
-  const rows = [];
+ipcMain.handle("app-platform", () => process.platform);
+ipcMain.handle("app-home", () => os.homedir());
+
+ipcMain.handle("scan-junk", async (_event, customTargets: string[] = []) => {
+  const targets = customTargets.length
+    ? customTargets
+    : getDefaultJunkTargets();
+  const rows: JunkRow[] = [];
 
   for (const target of targets) {
     const metrics = await quickDirMetrics(target);
@@ -206,69 +283,98 @@ ipcMain.handle('scan-junk', async (_event, customTargets: string[] = []) => {
   return rows;
 });
 
-ipcMain.handle('clean-junk-target', async (_event, targetPath: string, dryRun = false) => {
-  if (!targetPath) throw new Error('Path target kosong');
+ipcMain.handle(
+  "clean-junk-target",
+  async (_event, targetPath: string, dryRun = false) => {
+    if (!targetPath) throw new Error("Path target kosong");
 
-  let entries: string[];
-  try {
-    entries = await fsp.readdir(targetPath);
-  } catch {
-    throw new Error('Target tidak bisa dibaca');
-  }
-
-  if (dryRun) {
-    return {
-      dryRun: true,
-      wouldDeleteCount: entries.length,
-      sample: entries.slice(0, 20).map((n) => path.join(targetPath, n)),
-    };
-  }
-
-  const done: string[] = [];
-  const failed: Array<{ path: string; error: string }> = [];
-
-  for (const name of entries) {
-    const fullPath = path.join(targetPath, name);
+    let entries: string[];
     try {
-      await shell.trashItem(fullPath);
-      done.push(fullPath);
-    } catch (err: any) {
-      failed.push({ path: fullPath, error: err?.message || 'Gagal hapus' });
+      entries = await fsp.readdir(targetPath);
+    } catch {
+      throw new Error("Target tidak bisa dibaca");
     }
-  }
 
-  return { dryRun: false, done, failed };
-});
+    if (dryRun) {
+      return {
+        dryRun: true as const,
+        wouldDeleteCount: entries.length,
+        sample: entries.slice(0, 20).map((n) => path.join(targetPath, n)),
+      };
+    }
 
-ipcMain.handle('scan-large-files', async (_event, { rootDir, minMB = 100, maxResults = 500, maxDepth = 10, extensions = [] }) => {
-  if (!rootDir || !fs.existsSync(rootDir)) {
-    throw new Error('Folder tidak valid');
-  }
+    const done: string[] = [];
+    const failed: Array<{ path: string; error: string }> = [];
 
-  const minBytes = Number(minMB) * 1024 * 1024;
-  return walkDirForLargeFiles(rootDir, minBytes, {
-    maxResults: Number(maxResults),
-    maxDepth: Number(maxDepth),
-    extensions: Array.isArray(extensions) ? extensions : [],
-  });
-});
+    for (const name of entries) {
+      const fullPath = path.join(targetPath, name);
+      try {
+        await shell.trashItem(fullPath);
+        done.push(fullPath);
+      } catch (err: unknown) {
+        failed.push({
+          path: fullPath,
+          error: (err as Error)?.message ?? "Gagal hapus",
+        });
+      }
+    }
 
-ipcMain.handle('delete-paths', async (_event, paths: string[] = [], dryRun = false) => {
-  if (dryRun) {
-    return { dryRun: true, wouldDeleteCount: paths.length, sample: paths.slice(0, 20) };
-  }
+    return { dryRun: false as const, done, failed };
+  },
+);
 
-  const done: string[] = [];
-  const failed: Array<{ path: string; error: string }> = [];
+ipcMain.handle(
+  "scan-large-files",
+  async (_event, payload: ScanLargePayload) => {
+    const {
+      rootDir,
+      minMB = 100,
+      maxResults = 500,
+      maxDepth = 10,
+      extensions = [],
+    } = payload;
 
-  for (const p of paths) {
     try {
-      await shell.trashItem(p);
-      done.push(p);
-    } catch (err: any) {
-      failed.push({ path: p, error: err?.message || 'Gagal hapus' });
+      await fsp.access(rootDir);
+    } catch {
+      throw new Error("Folder tidak valid");
     }
-  }
 
-  return { dryRun: false, done, failed };
-});
+    const minBytes = Number(minMB) * 1024 * 1024;
+    return walkDirForLargeFiles(rootDir, minBytes, {
+      maxResults: Number(maxResults),
+      maxDepth: Number(maxDepth),
+      extensions: Array.isArray(extensions) ? extensions : [],
+    });
+  },
+);
+
+ipcMain.handle(
+  "delete-paths",
+  async (_event, paths: string[] = [], dryRun = false) => {
+    if (dryRun) {
+      return {
+        dryRun: true as const,
+        wouldDeleteCount: paths.length,
+        sample: paths.slice(0, 20),
+      };
+    }
+
+    const done: string[] = [];
+    const failed: Array<{ path: string; error: string }> = [];
+
+    for (const p of paths) {
+      try {
+        await shell.trashItem(p);
+        done.push(p);
+      } catch (err: unknown) {
+        failed.push({
+          path: p,
+          error: (err as Error)?.message ?? "Gagal hapus",
+        });
+      }
+    }
+
+    return { dryRun: false as const, done, failed };
+  },
+);
