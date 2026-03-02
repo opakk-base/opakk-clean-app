@@ -19,7 +19,10 @@
     "cache",
     "disk"
   ],
-  "author": "",
+  "author": {
+    "name": "Opakk",
+    "email": "support@opakk.id"
+  },
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^25.3.3",
@@ -58,7 +61,8 @@
         "AppImage",
         "deb"
       ],
-      "category": "Utility"
+      "category": "Utility",
+      "maintainer": "Opakk <support@opakk.id>"
     }
   }
 }
