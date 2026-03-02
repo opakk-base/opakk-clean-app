@@ -15,11 +15,18 @@ Aplikasi Electron untuk:
 - **Windows**: Temp/INetCache/Chrome Cache/VS Code Cache
 - **Linux**: `/tmp`, `~/.cache`, Trash, VS Code cache
 
-## Menjalankan
+## Menjalankan (electron-vite)
 
 ```bash
 cd electron-cleaner
 npm install
+npm run dev
+```
+
+Build production:
+
+```bash
+npm run build
 npm start
 ```
 
@@ -45,6 +52,28 @@ npm run dist:linux
 ```
 
 Output installer ada di folder `dist/`.
+
+## Struktur Project (baru)
+
+```text
+my-project/
+├─ src/
+│  ├─ main/
+│  │  └─ index.ts
+│  ├─ preload/
+│  │  └─ index.ts
+│  ├─ renderer/
+│  │  ├─ index.html
+│  │  ├─ index.ts
+│  │  ├─ core/
+│  │  └─ features/
+│  ├─ lib/
+│  ├─ shared/
+│  └─ resources/
+└─ static/
+```
+
+> Struktur sekarang sudah aktif dipakai oleh runtime melalui `electron-vite`.
 
 ## Catatan
 
