@@ -1,5 +1,5 @@
-import type { ScanLargeResult } from "../../../shared/types";
-import { appState } from "../../core/state";
+import type { ScanLargeResult, DeleteResult, DeleteDryRunResult } from "../../../shared/types";
+import { useAppStore } from "../../store";
 import { downloadTextFile, toCsv } from "../../core/utils";
 
 export async function scanLarge(payload: {
@@ -10,17 +10,26 @@ export async function scanLarge(payload: {
   extensions: string[];
 }): Promise<ScanLargeResult> {
   const result = await window.cleanerAPI.scanLargeFiles(payload);
-  appState.currentLargeFiles = result.files ?? [];
-  appState.currentTopFolders = result.topFolders ?? [];
+  useAppStore
+    .getState()
+    .setLargeFiles(result.files ?? [], result.topFolders ?? []);
   return result;
 }
 
+export async function deletePaths(
+  paths: string[],
+  dryRun: boolean,
+): Promise<DeleteResult | DeleteDryRunResult> {
+  return window.cleanerAPI.deletePaths(paths, dryRun);
+}
+
 export function exportJson(): void {
+  const { largeFiles, topFolders, junkRows: junkTargets } = useAppStore.getState();
   const payload = {
     generatedAt: new Date().toISOString(),
-    largeFiles: appState.currentLargeFiles,
-    topFolders: appState.currentTopFolders,
-    junkTargets: appState.lastJunkRows,
+    largeFiles,
+    topFolders,
+    junkTargets,
   };
   downloadTextFile(
     `cleaner-report-${Date.now()}.json`,
@@ -30,7 +39,8 @@ export function exportJson(): void {
 }
 
 export function exportCsv(): void {
-  const rows = appState.currentLargeFiles.map((f) => ({
+  const { largeFiles } = useAppStore.getState();
+  const rows = largeFiles.map((f) => ({
     path: f.path,
     size: f.size,
     sizeText: f.sizeText,

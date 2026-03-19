@@ -3,44 +3,11 @@ import type {
   CleanJunkResult,
   CleanJunkDryRunResult,
 } from "../../../shared/types";
-import { appState } from "../../core/state";
-
-export async function initPlatform(
-  platformNoteEl: HTMLElement,
-  rootDirInput: HTMLInputElement,
-  presetHandlers: {
-    onDownloads: (fn: () => void) => void;
-    onMovies: (fn: () => void) => void;
-    onDesktop: (fn: () => void) => void;
-  },
-): Promise<void> {
-  try {
-    const [platform, home] = await Promise.all([
-      window.cleanerAPI.getPlatform(),
-      window.cleanerAPI.getHome(),
-    ]);
-    const label =
-      platform === "darwin"
-        ? "macOS"
-        : platform === "win32"
-          ? "Windows"
-          : "Linux";
-    platformNoteEl.textContent = `Platform aktif: ${label}. Prioritas target junk: macOS > Windows > Linux.`;
-    if (platform === "darwin") rootDirInput.value = `${home}/Downloads`;
-
-    presetHandlers.onDownloads(
-      () => (rootDirInput.value = `${home}/Downloads`),
-    );
-    presetHandlers.onMovies(() => (rootDirInput.value = `${home}/Movies`));
-    presetHandlers.onDesktop(() => (rootDirInput.value = `${home}/Desktop`));
-  } catch {
-    // Platform detection failed — leave defaults
-  }
-}
+import { useAppStore } from "../../store";
 
 export async function scanJunk(): Promise<JunkRow[]> {
   const rows = await window.cleanerAPI.scanJunk([]);
-  appState.lastJunkRows = rows;
+  useAppStore.getState().setJunkRows(rows);
   return rows;
 }
 

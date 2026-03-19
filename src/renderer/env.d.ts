@@ -1,3 +1,5 @@
+/// <reference types="vite/client" />
+
 import type { CleanerAPI } from "../shared/types";
 
 declare global {

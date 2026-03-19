@@ -26,23 +26,24 @@ body {
 .app-shell {
   display: grid;
   grid-template-columns: 280px 1fr;
-  min-height: 100vh;
+  height: 100vh;
   gap: 14px;
   padding: 14px;
+  overflow: hidden;
 }
 
 .sidebar {
-  position: sticky;
-  top: 14px;
-  height: calc(100vh - 28px);
+  height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   gap: 16px;
+  overflow-y: auto;
 }
 
 .content {
-  padding-right: 6px;
+  height: 100%;
+  overflow: hidden;
 }
 
 .glass {
@@ -55,11 +56,11 @@ body {
 }
 
 h1 { margin: 0 0 8px; font-size: 22px; }
-h2 { margin: 0 0 10px; }
+h2 { margin: 0 0 20px; }
 
 .sidebar,
 section {
-  padding: 16px;
+  padding: 24px;
 }
 
 section {
@@ -71,7 +72,34 @@ section {
 }
 
 .content-panel.active-panel {
-  display: block;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  text-align: left;
+}
+
+.content-panel.active-panel > .results-area {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow: hidden;
+  margin-top: 12px;
+}
+
+.content-panel.active-panel > .results-area > .result {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  margin-top: 0;
+}
+
+.content-panel.active-panel > .results-area > .result-sm {
+  flex: 0 0 auto;
+  overflow: visible;
+  margin-top: 0;
 }
 
 .menu {
@@ -104,11 +132,13 @@ button {
   background: var(--primary);
   border: none;
   color: white;
-  padding: 9px 12px;
+  padding: 10px 16px;
   border-radius: 10px;
   cursor: pointer;
-  margin-right: 6px;
-  margin-bottom: 6px;
+  margin-right: 8px;
+  margin-bottom: 8px;
+  font-size: 13px;
+  text-align: left;
 }
 
 button:hover { background: var(--primary-hover); }
@@ -116,6 +146,7 @@ button:hover { background: var(--primary-hover); }
 .menu-btn {
   background: rgba(30, 41, 59, 0.45) !important;
   color: #dbeafe;
+  font-size: 13px;
 }
 
 .menu-btn:hover {
@@ -128,10 +159,10 @@ button:hover { background: var(--primary-hover); }
 
 .row {
   display: flex;
-  gap: 8px;
+  gap: 10px;
   align-items: center;
   flex-wrap: wrap;
-  margin-bottom: 8px;
+  margin-bottom: 16px;
 }
 
 .left-actions {
@@ -143,9 +174,9 @@ label { min-width: 120px; }
 .large-toolbar {
   display: grid;
   grid-template-columns: 1.4fr 0.6fr 1fr;
-  gap: 10px;
+  gap: 12px;
   align-items: end;
-  margin-bottom: 8px;
+  margin-bottom: 16px;
 }
 
 .field-group {
@@ -172,27 +203,50 @@ input {
   color: var(--text);
   border: 1px solid #4b607d;
   border-radius: 10px;
-  padding: 9px;
+  padding: 10px;
+  font-size: 13px;
+}
+
+input[type="checkbox"] {
+  flex: none;
+  min-width: auto;
+  width: auto;
+  height: auto;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  cursor: pointer;
+  accent-color: var(--primary);
 }
 
 .muted { color: var(--muted); }
 
 .result {
-  margin-top: 10px;
+  margin-top: 12px;
   background: rgba(11, 18, 32, 0.62);
   border: 1px solid rgba(100, 116, 139, 0.45);
   border-radius: 10px;
-  padding: 10px;
-  max-height: 300px;
-  overflow: auto;
+  padding: 14px;
+  overflow-y: auto;
   text-align: left;
 }
 
+.content-panel.active-panel > .result {
+  max-height: 0;
+}
+
+.content-panel.active-panel > .result:only-child {
+  flex: 1;
+  min-height: 0;
+  margin-top: 12px;
+}
+
 .loading-card {
-  margin-top: 10px;
+  margin-top: 12px;
   border: 1px solid rgba(100, 116, 139, 0.45);
   border-radius: 10px;
-  padding: 12px;
+  padding: 16px;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -223,20 +277,83 @@ input {
 .file-item {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px;
+  gap: 10px;
+  padding: 8px 6px;
   border-bottom: 1px solid rgba(51, 65, 85, 0.6);
 }
 
-.path { color: #d5deeb; font-size: 12px; }
-.size { color: var(--ok); font-size: 12px; min-width: 82px; }
+.file-item:last-child {
+  border-bottom: none;
+}
+
+.path { color: #d5deeb; font-size: 13px; word-break: break-all; }
+.size { color: var(--ok); font-size: 13px; min-width: 82px; white-space: nowrap; }
 
 .folder-row {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   gap: 8px;
-  padding: 4px 0;
-  border-bottom: 1px dashed rgba(51, 65, 85, 0.75);
+  padding: 8px 10px;
+  border-bottom: 1px solid rgba(51, 65, 85, 0.6);
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background 0.15s;
+}
+
+.folder-row:hover {
+  background: rgba(79, 140, 255, 0.1);
+}
+
+.folder-row.active {
+  background: rgba(79, 140, 255, 0.2);
+  border-color: rgba(125, 171, 255, 0.4);
+}
+
+.folder-row:last-child {
+  border-bottom: none;
+}
+
+.folder-list {
+  margin-top: 0 !important;
+}
+
+.folder-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.folder-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+}
+
+.folder-reset-btn {
+  flex-shrink: 0;
+  background: transparent;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  color: var(--muted);
+  padding: 4px 10px;
+  font-size: 11px;
+  border-radius: 6px;
+  margin: 0;
+}
+
+.folder-reset-btn:hover {
+  background: rgba(79, 140, 255, 0.15);
+  border-color: rgba(125, 171, 255, 0.5);
+  color: var(--text);
+}
+
+.filter-info {
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(51, 65, 85, 0.4);
+  margin-bottom: 4px;
+  font-size: 12px;
 }
 
 .clean-btn {
@@ -246,21 +363,44 @@ input {
 .clean-btn:hover { background: #0284c7; }
 .clean-btn.dry { background: #64748b; }
 
+.delete-section {
+  flex-shrink: 0;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(100, 116, 139, 0.45);
+}
+
+.delete-section .row-inline {
+  margin-bottom: 10px;
+}
+
 .row-inline {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 8px;
+  gap: 10px;
+  margin-bottom: 16px;
 }
 
 @media (max-width: 960px) {
   .app-shell {
     grid-template-columns: 1fr;
+    height: auto;
+    overflow: auto;
   }
 
   .sidebar {
     position: relative;
     height: auto;
+  }
+
+  .content {
+    height: auto;
+    overflow: auto;
+  }
+
+  .content-panel.active-panel {
+    height: auto;
+    overflow: visible;
   }
 
   .large-toolbar {
