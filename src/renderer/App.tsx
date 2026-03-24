@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { Sidebar } from "./features/sidebar/Sidebar";
 import { JunkPanel } from "./features/junk/JunkPanel";
 import { LargePanel } from "./features/large/LargePanel";
+import { AppsPanel } from "./features/apps/AppsPanel";
 import { useAppStore } from "./store";
 
 export function App() {
@@ -23,6 +24,7 @@ export function App() {
       <main className="content">
         {activePanel === "junk" && <JunkPanel />}
         {activePanel === "large" && <LargePanel />}
+        {activePanel === "apps" && <AppsPanel />}
       </main>
     </div>
   );

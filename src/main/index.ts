@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, shell } from "electron";
+import { app, BrowserWindow, ipcMain, shell, dialog } from "electron";
 import path from "path";
 import fs from "fs";
 import fsp from "fs/promises";
@@ -10,6 +10,7 @@ import type {
   TopFolder,
   ScanLargeResult,
 } from "../shared/types";
+import { getScanner, getScannerInfo, getStreamingScanner } from "./scanners";
 
 function createWindow(): void {
   const win = new BrowserWindow({
@@ -263,6 +264,20 @@ async function walkDirForLargeFiles(
 ipcMain.handle("app-platform", () => process.platform);
 ipcMain.handle("app-home", () => os.homedir());
 
+ipcMain.handle("open-folder-dialog", async (event) => {
+  const win = BrowserWindow.fromWebContents(event.sender);
+  const result = win
+    ? await dialog.showOpenDialog(win, {
+        properties: ["openDirectory"],
+        title: "Select Folder to Scan",
+      })
+    : await dialog.showOpenDialog({
+        properties: ["openDirectory"],
+        title: "Select Folder to Scan",
+      });
+  return result.canceled ? null : result.filePaths[0];
+});
+
 ipcMain.handle("scan-junk", async (_event, customTargets: string[] = []) => {
   const targets = customTargets.length
     ? customTargets
@@ -378,3 +393,92 @@ ipcMain.handle(
     return { dryRun: false as const, done, failed };
   },
 );
+
+// ─── Installed Apps ───────────────────────────────────────────
+
+ipcMain.handle("get-scanner-info", () => {
+  return getScannerInfo();
+});
+
+ipcMain.handle("scan-installed-apps", async () => {
+  const scanner = getScanner();
+  return scanner.scanInstalledApps();
+});
+
+ipcMain.handle("get-app-details", async (_event, appId: string) => {
+  const scanner = getScanner();
+  return scanner.getAppDetails(appId);
+});
+
+ipcMain.handle(
+  "uninstall-app",
+  async (_event, appId: string, options: { keepData: boolean }) => {
+    const scanner = getScanner();
+    return scanner.uninstallApp(appId, options.keepData);
+  },
+);
+
+ipcMain.handle("scan-leftovers", async () => {
+  const scanner = getScanner();
+  return scanner.scanLeftovers();
+});
+
+ipcMain.handle("clean-leftovers", async (_event, paths: string[] = []) => {
+  const done: string[] = [];
+  const failed: Array<{ path: string; error: string }> = [];
+
+  for (const p of paths) {
+    try {
+      await shell.trashItem(p);
+      done.push(p);
+    } catch (err: unknown) {
+      failed.push({
+        path: p,
+        error: (err as Error)?.message ?? "Failed to delete",
+      });
+    }
+  }
+
+  return { done, failed };
+});
+
+// ─── Streaming App Scan ───────────────────────────────────────
+
+let appScanController: AbortController | null = null;
+
+ipcMain.on("start-app-scan", (event) => {
+  const streamingScanner = getStreamingScanner();
+  if (!streamingScanner) {
+    event.sender.send("scan-complete");
+    return;
+  }
+
+  appScanController = new AbortController();
+
+  streamingScanner.scanInstalledAppsStreaming(
+    {
+      onAppFound: (app) => {
+        event.sender.send("app-found", app);
+      },
+      onProgress: (progress) => {
+        event.sender.send("scan-progress", progress);
+      },
+    },
+    appScanController.signal
+  ).then(() => {
+    event.sender.send("scan-complete");
+    appScanController = null;
+  }).catch((err: Error) => {
+    if (err.name !== "AbortError") {
+      console.error("App scan error:", err);
+    }
+    appScanController = null;
+  });
+});
+
+ipcMain.on("cancel-app-scan", () => {
+  if (appScanController) {
+    appScanController.abort();
+    appScanController = null;
+  }
+});

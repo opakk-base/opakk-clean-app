@@ -2,7 +2,8 @@ import { useAppStore, type Panel } from "../../store";
 
 const items: { label: string; target: Panel }[] = [
   { label: "Cache / Junk", target: "junk" },
-  { label: "File Besar", target: "large" },
+  { label: "Large Files", target: "large" },
+  { label: "Installed Apps", target: "apps" },
 ];
 
 export function Sidebar() {
